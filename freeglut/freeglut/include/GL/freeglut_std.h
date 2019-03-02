@@ -489,6 +489,7 @@ FGAPI void    FGAPIENTRY glutIdleFunc( void (* callback)( void ) );
  * Window-specific callback functions, see fg_callbacks.c
  */
 FGAPI void    FGAPIENTRY glutKeyboardFunc( void (* callback)( unsigned char, int, int ) );
+FGAPI void    FGAPIENTRY glutKeyboardWFunc( void (* callback)( int, int, int ) );
 FGAPI void    FGAPIENTRY glutSpecialFunc( void (* callback)( int, int, int ) );
 FGAPI void    FGAPIENTRY glutReshapeFunc( void (* callback)( int, int ) );
 FGAPI void    FGAPIENTRY glutVisibilityFunc( void (* callback)( int ) );
@@ -499,6 +500,7 @@ FGAPI void    FGAPIENTRY glutPassiveMotionFunc( void (* callback)( int, int ) );
 FGAPI void    FGAPIENTRY glutEntryFunc( void (* callback)( int ) );
 
 FGAPI void    FGAPIENTRY glutKeyboardUpFunc( void (* callback)( unsigned char, int, int ) );
+FGAPI void    FGAPIENTRY glutKeyboardUpWFunc( void (* callback)( int, int, int ) );
 FGAPI void    FGAPIENTRY glutSpecialUpFunc( void (* callback)( int, int, int ) );
 FGAPI void    FGAPIENTRY glutJoystickFunc( void (* callback)( unsigned int, int, int, int ), int pollInterval );
 FGAPI void    FGAPIENTRY glutMenuStateFunc( void (* callback)( int ) );

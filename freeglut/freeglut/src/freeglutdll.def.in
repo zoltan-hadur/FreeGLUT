@@ -53,6 +53,7 @@ EXPORTS
     glutTimerFunc
     glutIdleFunc
     glutKeyboardFunc
+    glutKeyboardWFunc
     glutSpecialFunc
     glutReshapeFunc
     glutPositionFunc
@@ -66,6 +67,7 @@ EXPORTS
     glutCloseFunc
     glutWMCloseFunc
     glutKeyboardUpFunc
+    glutKeyboardUpWFunc
     glutSpecialUpFunc
     glutJoystickFunc
     glutMenuStateFunc

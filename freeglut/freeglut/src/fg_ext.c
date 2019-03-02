@@ -88,6 +88,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutReshapeFunc);
     CHECK_NAME(glutPositionFunc);
     CHECK_NAME(glutKeyboardFunc);
+    CHECK_NAME(glutKeyboardWFunc);
     CHECK_NAME(glutMouseFunc);
     CHECK_NAME(glutMultiEntryFunc);
     CHECK_NAME(glutMultiMotionFunc);
@@ -112,6 +113,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutOverlayDisplayFunc);
     CHECK_NAME(glutWindowStatusFunc);
     CHECK_NAME(glutKeyboardUpFunc);
+    CHECK_NAME(glutKeyboardUpWFunc);
     CHECK_NAME(glutSpecialUpFunc);
     CHECK_NAME(glutSetColor);
     CHECK_NAME(glutGetColor);
@@ -216,6 +218,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutTimerFuncUcall);
     CHECK_NAME(glutIdleFuncUcall);
     CHECK_NAME(glutKeyboardFuncUcall);
+    CHECK_NAME(glutKeyboardWFuncUcall);
     CHECK_NAME(glutSpecialFuncUcall);
     CHECK_NAME(glutReshapeFuncUcall);
     CHECK_NAME(glutVisibilityFuncUcall);
@@ -225,6 +228,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutPassiveMotionFuncUcall);
     CHECK_NAME(glutEntryFuncUcall);
     CHECK_NAME(glutKeyboardUpFuncUcall);
+    CHECK_NAME(glutKeyboardUpWFuncUcall);
     CHECK_NAME(glutSpecialUpFuncUcall);
     CHECK_NAME(glutJoystickFuncUcall);
     CHECK_NAME(glutMenuStatusFuncUcall);

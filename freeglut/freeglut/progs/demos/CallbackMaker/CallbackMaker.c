@@ -289,6 +289,22 @@ Key(unsigned char key, int x, int y)
   glutPostRedisplay () ;
 }
 
+static void
+KeyW(int key, int x, int y)
+{
+  int winIdx;
+  int window = getWindowAndIdx(&winIdx);
+  printf("%6d Window %d Keyboard Callback:  %d %d %d\n",
+         ++sequence_number, window, key, x, y);
+  key_called[winIdx] = 1;
+  key_key[winIdx] = key;
+  key_x[winIdx] = x;
+  key_y[winIdx] = y;
+  key_seq[winIdx] = sequence_number;
+  key_mod[winIdx] = glutGetModifiers();
+  glutPostRedisplay();
+}
+
 static void 
 KeyUp(unsigned char key, int x, int y)
 {
@@ -303,6 +319,22 @@ KeyUp(unsigned char key, int x, int y)
   keyup_seq[winIdx] = sequence_number ;
   keyup_mod[winIdx] = glutGetModifiers() ;
   glutPostRedisplay () ;
+}
+
+static void
+KeyUpW(int key, int x, int y)
+{
+  int winIdx;
+  int window = getWindowAndIdx(&winIdx);
+  printf("%6d Window %d Key Release Callback:  %d %d %d\n",
+         ++sequence_number, window, key, x, y);
+  keyup_called[winIdx] = 1;
+  keyup_key[winIdx] = key;
+  keyup_x[winIdx] = x;
+  keyup_y[winIdx] = y;
+  keyup_seq[winIdx] = sequence_number;
+  keyup_mod[winIdx] = glutGetModifiers();
+  glutPostRedisplay();
 }
 
 static void 
@@ -591,8 +623,10 @@ static void SetWindowCallbacks( int first )
     glutReshapeFunc( Reshape );
     glutPositionFunc( Position );
     glutKeyboardFunc( Key );
+    glutKeyboardWFunc( KeyW );
     glutSpecialFunc( Special );
     glutKeyboardUpFunc( KeyUp );
+    glutKeyboardUpWFunc( KeyUpW );
     glutSpecialUpFunc( SpecialUp );
     if (first)
         glutJoystickFunc( Joystick, 100 );

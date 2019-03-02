@@ -664,25 +664,52 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
     case VK_DELETE:
         /* The delete key should be treated as an ASCII keypress: */
         if (keydown)
+        {
             INVOKE_WCB( *window, Keyboard,
                         ( 127, window->State.MouseX, window->State.MouseY )
             );
+            INVOKE_WCB( *window, KeyboardW,
+                        (127, window->State.MouseX, window->State.MouseY)
+            );
+        }
         else
+        {
             INVOKE_WCB( *window, KeyboardUp,
                         ( 127, window->State.MouseX, window->State.MouseY )
             );
+            INVOKE_WCB( *window, KeyboardUpW,
+                        (127, window->State.MouseX, window->State.MouseY)
+            );
+        }
         break;
 
 #if !defined(_WIN32_WCE)
     default:
+    {
+        BYTE state[256];
+        LPWSTR code[4];
+        GetKeyboardState(state);
+
+        ToUnicode((UINT)wParam, 0, state, code, 4, 0);
+        if (code[0] != 0)
+        {
+          if (keydown)
+          {
+            INVOKE_WCB(*window, KeyboardW,
+              (code[0], window->State.MouseX, window->State.MouseY)
+            );
+          }
+          else
+          {
+            INVOKE_WCB(*window, KeyboardUpW,
+              (code[0], window->State.MouseX, window->State.MouseY)
+            );
+          }
+        }
         /* keydown displayable characters are handled with WM_CHAR message, but no corresponding up is generated. So get that here. */
         if (!keydown)
         {
-            BYTE state[ 256 ];
             WORD code[ 2 ];
-
-            GetKeyboardState( state );
-
             if( ToAscii( (UINT)wParam, 0, state, code, 0 ) == 1 )
                 wParam=code[ 0 ];
 
@@ -691,6 +718,7 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
                         window->State.MouseX, window->State.MouseY )
             );
         }
+    }
 #endif
     }
 
