@@ -16,19 +16,19 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # setup version numbers
-# TODO: Update these for each release!
+# XXX: Update these for each release!
 set(VERSION_MAJOR 3)
-set(VERSION_MINOR 0)
-set(VERSION_PATCH 0)
+set(VERSION_MINOR 2)
+set(VERSION_PATCH 2)
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 # Update fg_version.h to match the versions number here in cmake
 CONFIGURE_FILE(src/fg_version.h.in src/fg_version.h)
 
-# shared lib version numbers (change before release)
+# shared lib version numbers (XXX: change before release)
 set(SO_MAJOR 3)		# increment on backwards incompatible API/ABI changes
-set(SO_MINOR 10)	# increment on backwards compatible or internal changes
-set(SO_REV 0)		# if nothing else changed increment this
+set(SO_MINOR 11)	# increment on backwards compatible API additions
+set(SO_REV 1)		# increment if only internal changes happened between releases
 
 # FREEGLUT_BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
 # re-declare it here so it will show up in the GUI.
@@ -51,7 +51,11 @@ ELSE()
 ENDIF()
 
 # OpenGL ES support
-OPTION(FREEGLUT_GLES "Use OpenGL ES (requires EGL)" OFF)
+IF(ANDROID)
+    OPTION(FREEGLUT_GLES "Use OpenGL ES (requires EGL)" ON)
+ELSE()
+    OPTION(FREEGLUT_GLES "Use OpenGL ES (requires EGL)" OFF)
+ENDIF()
 
 # option to build either as "glut" (ON) or "freeglut" (OFF)
 IF(WIN32)
@@ -73,7 +77,7 @@ SET(FREEGLUT_HEADERS
     include/GL/freeglut_std.h
 )
 IF(FREEGLUT_REPLACE_GLUT)
-    LIST(APPEND FREEGLUT_SRCS
+    LIST(APPEND FREEGLUT_HEADERS
         include/GL/glut.h
     )
 ENDIF()
@@ -312,8 +316,8 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 INCLUDE(CheckIncludeFiles)
 IF(UNIX AND NOT(ANDROID OR BLACKBERRY OR FREEGLUT_WAYLAND))
     FIND_PACKAGE(X11 REQUIRED)
-    INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
-    LIST(APPEND LIBS ${X11_LIBRARIES})
+    INCLUDE_DIRECTORIES(${X11_X11_INCLUDE_PATH})
+    LIST(APPEND LIBS ${X11_X11_LIB})
     IF(X11_Xrandr_FOUND)
         SET(HAVE_X11_EXTENSIONS_XRANDR_H TRUE)
         LIST(APPEND LIBS ${X11_Xrandr_LIB})
@@ -348,6 +352,7 @@ ENDIF()
 
 INCLUDE(CheckFunctionExists)
 INCLUDE(CheckTypeSize)
+INCLUDE(CheckCCompilerFlag)
 CHECK_INCLUDE_FILES(sys/types.h HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(unistd.h 	HAVE_UNISTD_H)
 CHECK_INCLUDE_FILES(sys/time.h 	HAVE_SYS_TIME_H)
@@ -416,7 +421,12 @@ IF(WIN32)
     IF(FREEGLUT_BUILD_STATIC_LIBS)
         TARGET_COMPILE_DEFINITIONS(freeglut_static PUBLIC FREEGLUT_STATIC)
         IF(FREEGLUT_REPLACE_GLUT)
-            SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME ${LIBNAME})
+            # on MSVC static lib and import from shared lib have the same name
+            IF(MSVC AND FREEGLUT_BUILD_SHARED_LIBS)
+                SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME ${LIBNAME}_static)
+            ELSE()
+                SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME ${LIBNAME})
+            ENDIF()
         ENDIF()
         # need to set machine:x64 for linker, at least for VC10, and
         # doesn't hurt for older compilers:
@@ -466,7 +476,14 @@ ELSE()
         IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
             SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mandroid")
         ENDIF()
-        SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -gstabs+")
+        CHECK_C_COMPILER_FLAG(-O0 HAVE_O0_FLAG)
+        IF(HAVE_O0_FLAG)
+            SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+        ENDIF()
+        CHECK_C_COMPILER_FLAG(-gstabs+ HAVE_GSTABSP_FLAG)
+        IF(HAVE_gstabsp_FLAG)
+            SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -gstabs+")
+        ENDIF()
     ENDIF()
 ENDIF()
 IF(FREEGLUT_BUILD_SHARED_LIBS)
@@ -622,7 +639,7 @@ CONFIGURE_FILE(FreeGLUTConfig.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/FreeGLUT/FreeGLUTConfig.cmake"
     @ONLY
 )
-SET(ConfigPackageLocation lib/cmake/FreeGLUT)
+SET(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/FreeGLUT)
 INSTALL(EXPORT FreeGLUTTargets
     FILE FreeGLUTTargets.cmake
     NAMESPACE FreeGLUT::
